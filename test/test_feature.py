@@ -1,24 +1,6 @@
 import pytest
 import numpy as np
 import algorithm
-from index import _accumulate_score_and_attempts
-
-from test.fixtures.accumulation import EXPECTED_ACCUMULATED_STUDY_GUIDE_ALPHA_AND_BETA,\
-    EXPECTED_ACCUMULATED_TOPIC_ALPHA_AND_BETA, QUESTIONS_TO_TEST_ACCUMULATION,\
-    STUDY_GUIDE_ID_LIST, TOPIC_ID_LIST
-
-
-# ------------------------------------------
-# Feature tests on accumulate_alpha_and_beta
-# ------------------------------------------
-
-@pytest.mark.functionality_accumulate_score_and_attempts
-def test_accumulation_of_score_and_attempts():
-    study_guide_alpha_and_beta, topic_alpha_and_beta = \
-        _accumulate_score_and_attempts(
-            STUDY_GUIDE_ID_LIST, TOPIC_ID_LIST, QUESTIONS_TO_TEST_ACCUMULATION)
-    assert study_guide_alpha_and_beta == EXPECTED_ACCUMULATED_STUDY_GUIDE_ALPHA_AND_BETA
-    assert topic_alpha_and_beta == EXPECTED_ACCUMULATED_TOPIC_ALPHA_AND_BETA
 
 
 # -----------------------------------------
@@ -81,10 +63,10 @@ def test_calculate_confidence_interval_in_range_0_to_1():
 def test_calculate_confidence_intervals_list_returns_list():
     study_guide_id_list = ['z1', 'z2']
     weighted_score_and_attempts = {
-        'z1': {'weighted_alpha': 0.,
-               'weighted_beta': 0.},
-        'z2': {'weighted_alpha': 0.,
-               'weighted_beta': 0.}
+        'z1': {'weighted_score': 0.,
+               'weighted_attempts': 0.},
+        'z2': {'weighted_score': 0.,
+               'weighted_attempts': 0.}
     }
     confidence_intervals_list = \
         algorithm.calculate_confidence_intervals_list(
@@ -96,10 +78,10 @@ def test_calculate_confidence_intervals_list_returns_list():
 def test_calculate_confidence_intervals_list_returns_floats():
     study_guide_id_list = ['z1', 'z2']
     weighted_score_and_attempts = {
-        'z1': {'weighted_alpha': 10.,
-               'weighted_beta': 10.},
-        'z2': {'weighted_alpha': 0.,
-               'weighted_beta': 10.}
+        'z1': {'weighted_score': 10.,
+               'weighted_attempts': 10.},
+        'z2': {'weighted_score': 0.,
+               'weighted_attempts': 10.}
     }
     confidence_intervals_list = \
         algorithm.calculate_confidence_intervals_list(
@@ -112,10 +94,10 @@ def test_calculate_confidence_intervals_list_returns_floats():
 def test_calculate_confidence_intervals_list_returns_floats_in_range_0_to_1():
     study_guide_id_list = ['z1', 'z2']
     weighted_score_and_attempts = {
-        'z1': {'weighted_alpha': 10.,
-               'weighted_beta': 10.},
-        'z2': {'weighted_alpha': 0.,
-               'weighted_beta': 10.}
+        'z1': {'weighted_score': 10.,
+               'weighted_attempts': 10.},
+        'z2': {'weighted_score': 0.,
+               'weighted_attempts': 10.}
     }
     confidence_intervals_list = \
         algorithm.calculate_confidence_intervals_list(
@@ -177,9 +159,7 @@ def test_convert_confidence_interval_into_probability_probabilities_monotonic():
 def test_calculate_beta_distribution_mean_returns_float():
     score = 1.
     attempts = 2.
-    alpha = 1 + score
-    beta_ = 1 + attempts - score
-    mastery = algorithm.calculate_beta_distribution_mean(alpha, beta_)
+    mastery = algorithm.calculate_beta_distribution_mean(score, attempts)
     assert isinstance(mastery, float)
 
 
@@ -187,9 +167,7 @@ def test_calculate_beta_distribution_mean_returns_float():
 def test_calculate_beta_distribution_mean_in_range_0_to_1():
     score = 1.
     attempts = 2.
-    alpha = 1 + score
-    beta_ = 1 + attempts - score
-    mastery = algorithm.calculate_beta_distribution_mean(alpha, beta_)
+    mastery = algorithm.calculate_beta_distribution_mean(score, attempts)
     assert mastery == pytest.approx(0.5, abs=0.5)
 
 
@@ -197,9 +175,7 @@ def test_calculate_beta_distribution_mean_in_range_0_to_1():
 def test_calculate_beta_distribution_mean_is_half():
     score = 1.
     attempts = 2.
-    alpha = 1 + score
-    beta_ = 1 + attempts - score
-    mastery = algorithm.calculate_beta_distribution_mean(alpha, beta_)
+    mastery = algorithm.calculate_beta_distribution_mean(score, attempts)
     assert mastery == 0.5
 
 
@@ -207,9 +183,7 @@ def test_calculate_beta_distribution_mean_is_half():
 def test_calculate_beta_distribution_mean_is_2_thirds():
     score = 1.
     attempts = 1.
-    alpha = 1 + score
-    beta_ = 1 + attempts - score
-    mastery = algorithm.calculate_beta_distribution_mean(alpha, beta_)
+    mastery = algorithm.calculate_beta_distribution_mean(score, attempts)
     assert mastery == 2 / 3
 
 
@@ -217,9 +191,7 @@ def test_calculate_beta_distribution_mean_is_2_thirds():
 def test_calculate_beta_distribution_mean_is_1_thirds():
     score = 0.
     attempts = 1.
-    alpha = 1 + score
-    beta_ = 1 + attempts - score
-    mastery = algorithm.calculate_beta_distribution_mean(alpha, beta_)
+    mastery = algorithm.calculate_beta_distribution_mean(score, attempts)
     assert mastery == 1 / 3
 
 
@@ -332,21 +304,21 @@ def test_calculate_study_guide_weighting_in_range_0_to_1():
 
 @pytest.mark.feature_calculate_study_guide_weighting
 def test_calculate_study_guide_weighting_1_when_much_better_at_guide():
-    study_guide_alpha = 101.
-    study_guide_beta = 1.
-    topic_alpha = 101.
-    topic_beta = 901.
+    study_guide_score = 100.
+    study_guide_attempts = 100.
+    topic_score = 100.
+    topic_attempts = 1000.
     weighting = algorithm.calculate_study_guide_weighting(
-        study_guide_alpha, study_guide_beta, topic_alpha, topic_beta)
+        study_guide_score, study_guide_attempts, topic_score, topic_attempts)
     assert weighting == pytest.approx(1, rel=1e-6)
 
 
 @pytest.mark.feature_calculate_study_guide_weighting
 def test_calculate_study_guide_weighting_1_when_much_worse_at_guide():
-    study_guide_alpha = 1.
-    study_guide_beta = 101.
-    topic_alpha = 101.
-    topic_beta = 1.
+    study_guide_score = 0.
+    study_guide_attempts = 100.
+    topic_score = 100.
+    topic_attempts = 100.
     weighting = algorithm.calculate_study_guide_weighting(
-        study_guide_alpha, study_guide_beta, topic_alpha, topic_beta)
+        study_guide_score, study_guide_attempts, topic_score, topic_attempts)
     assert weighting == pytest.approx(1, rel=1e-6)

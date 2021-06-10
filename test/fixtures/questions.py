@@ -152,57 +152,57 @@ REPEATABLE_RESULTS = [
       "studyGuideId": "z9vrjty",
       "topicId": "zcj78mn",
       "band": 2,
-      "masteryScore": 43.24324324360151,
-      "confidenceScore": 53.67022655398015
+      "masteryScore": 43.243243243601505,
+      "confidenceScore": 53.670226553980136
     },
     {
       "studyGuideId": "zxtscj6",
       "topicId": "zcj78mn",
       "band": 2,
       "masteryScore": 39.09465020636277,
-      "confidenceScore": 49.244576470397654
+      "confidenceScore": 49.24457647039768
     },
     {
       "studyGuideId": "zcpxfcw",
       "topicId": "zcj78mn",
       "band": 2,
       "masteryScore": 66.93548387507578,
-      "confidenceScore": 56.093659418506526
+      "confidenceScore": 56.09365941850655
     },
     {
       "studyGuideId": "zsfpb82",
       "topicId": "zcj78mn",
       "band": 2,
-      "masteryScore": 43.24324324360151,
-      "confidenceScore": 53.67022655398015
+      "masteryScore": 43.243243243601505,
+      "confidenceScore": 53.670226553980136
     },
     {
       "studyGuideId": "zpk2srd",
       "topicId": "zcj78mn",
       "band": 2,
       "masteryScore": 52.32558139681658,
-      "confidenceScore": 58.06586794200328
+      "confidenceScore": 58.065867942003216
     },
     {
       "studyGuideId": "zxmmsrd",
       "topicId": "zcj78mn",
       "band": 2,
       "masteryScore": 39.09465020636277,
-      "confidenceScore": 49.244576470397654
+      "confidenceScore": 49.24457647039768
     },
     {
       "studyGuideId": "zy98msg",
       "topicId": "zcj78mn",
       "band": 2,
       "masteryScore": 39.09465020636277,
-      "confidenceScore": 49.244576470397654
+      "confidenceScore": 49.24457647039768
     },
     {
       "studyGuideId": "zgmpgdm",
       "topicId": "zcj78mn",
       "band": 2,
-      "masteryScore": 43.24324324360151,
-      "confidenceScore": 53.67022655398015
+      "masteryScore": 43.243243243601505,
+      "confidenceScore": 53.670226553980136
     },
     {
       "studyGuideId": "zscrw6f",
@@ -215,8 +215,8 @@ REPEATABLE_RESULTS = [
       "studyGuideId": "z2ty97h",
       "topicId": "zcj78mn",
       "band": 2,
-      "masteryScore": 43.24324324360151,
-      "confidenceScore": 53.67022655398015
+      "masteryScore": 43.243243243601505,
+      "confidenceScore": 53.670226553980136
     },
     {
       "studyGuideId": "zgcrxfr",
@@ -258,21 +258,21 @@ REPEATABLE_RESULTS = [
       "topicId": "zxsyh39",
       "band": 2,
       "masteryScore": 46.11872134629721,
-      "confidenceScore": 51.74424069388888
+      "confidenceScore": 51.74424069388891
     },
     {
       "studyGuideId": "z9nr6yc",
       "topicId": "z398rwx",
       "band": 3,
-      "masteryScore": 69.85294107719446,
-      "confidenceScore": 61.990312061800246
+      "masteryScore": 69.85294107719447,
+      "confidenceScore": 61.99031206180028
     },
     {
       "studyGuideId": "zsf9pbk",
       "topicId": "z398rwx",
       "band": 3,
-      "masteryScore": 69.85294107719446,
-      "confidenceScore": 61.990312061800246
+      "masteryScore": 69.85294107719447,
+      "confidenceScore": 61.99031206180028
     },
     {
       "studyGuideId": "z2rmrwx",
@@ -285,8 +285,8 @@ REPEATABLE_RESULTS = [
       "studyGuideId": "z2jndxs",
       "topicId": "z398rwx",
       "band": 3,
-      "masteryScore": 69.85294107719446,
-      "confidenceScore": 61.990312061800246
+      "masteryScore": 69.85294107719447,
+      "confidenceScore": 61.99031206180028
     },
     {
       "studyGuideId": "ztr7b82",

@@ -1,13 +1,8 @@
 import itertools
-import os
 import boto3
-import json
 from storage_client import StorageClient
 
 client = StorageClient(boto3.client('s3'))
-
-INFORMED_PRIORS_PATH = os.getenv('INFORMED_PRIORS_PATH') or ''
-INFORMED_PRIORS_FILE = os.getenv('INFORMED_PRIORS_FILE') or 'informed_priors.txt'
 
 
 def get_study_guide_id_list(topic_ids):
@@ -38,17 +33,3 @@ def get_topic_id(study_guide_ids):
                 f'[NOT FOUND]: No topicId found for studyGuideId: {study_guide_id}')
 
     return topic_id_for_study_guide_id
-
-
-def load_informed_priors():
-    with open(f"{INFORMED_PRIORS_PATH}/{INFORMED_PRIORS_FILE}") as json_file:
-        informed_priors_loaded = json.load(json_file)
-
-    informed_priors_params = {}
-    for attempts, scores_and_params in informed_priors_loaded.items():
-        informed_priors_params[int(attempts)] = {
-            int(score): informed_priors_loaded[attempts][score]
-            for score, params in scores_and_params.items()
-        }
-
-    return informed_priors_params

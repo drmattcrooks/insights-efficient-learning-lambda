@@ -2,7 +2,6 @@ import pytest
 
 from docstrings import _add_docstring
 import algorithm
-import index
 
 
 @pytest.mark.docstring_test
@@ -15,11 +14,6 @@ def test_docstring_added():
 
     assert function_with_docstring.__class__.__name__ == 'function'
     assert function_with_docstring.__doc__ == 'a docstring'
-
-
-@pytest.mark.docstring_test
-def test_accumulate_score_and_attempts():
-    assert index._accumulate_score_and_attempts.__doc__ is not None
 
 
 @pytest.mark.docstring_test

@@ -44,48 +44,40 @@ def test_choose_next_question_multiple_recursions(mocker):
 
 
 def test_get_mastery_band_and_confidence_confident_band1():
-    mastery, weighted_alpha, weighted_beta = 1 / 6, 1., 5.
     actual_mastery_band, actual_confidence = algorithm.calculate_mastery_band_and_confidence(
-        mastery, weighted_alpha, weighted_beta)
+        1 / 6, 0., 4.)
 
     assert actual_mastery_band == 1
     assert actual_confidence == pytest.approx(0.87, abs=0.005)
 
 
 def test_get_mastery_band_and_confidence_uncertain_band2():
-    mastery, weighted_alpha, weighted_beta = 2 / 3, 2., 1.
     actual_mastery_band, actual_confidence = algorithm.calculate_mastery_band_and_confidence(
-        mastery, weighted_alpha, weighted_beta)
+        2 / 3, 1., 1.)
 
     assert actual_mastery_band == 2
     assert actual_confidence == pytest.approx(0.56, abs=0.005)
 
 
 def test_get_mastery_band_and_confidence_confident_band2():
-    mastery, weighted_alpha, weighted_beta = 0.5, 5., 5.
     actual_mastery_band, actual_confidence = algorithm.calculate_mastery_band_and_confidence(
-        mastery, weighted_alpha, weighted_beta)
+        0.5, 4., 8.)
 
     assert actual_mastery_band == 2
     assert actual_confidence == pytest.approx(0.69, abs=0.005)
 
 
 def test_get_mastery_band_and_confidence_confident_band3():
-    mastery, weighted_alpha, weighted_beta = 5 / 6, 5., 1.
     actual_mastery_band, actual_confidence = algorithm.calculate_mastery_band_and_confidence(
-        mastery, weighted_alpha, weighted_beta)
+        5 / 6, 4., 4.)
 
     assert actual_mastery_band == 3
     assert actual_confidence == pytest.approx(0.87, abs=0.005)
 
 
 def test_thompson_sampling_integral_returns_correct_values():
-    study_guide_alpha, study_guide_beta, topic_alpha, topic_beta = 1., 3., 2., 3.
-    actual_weighting = _calculate_thompson_sampling(
-        study_guide_alpha, study_guide_beta, topic_alpha, topic_beta)
+    actual_weighting = _calculate_thompson_sampling(0, 2, 1, 3)
     assert actual_weighting == pytest.approx(0.286, abs=0.001)
 
-    study_guide_alpha, study_guide_beta, topic_alpha, topic_beta = 3., 1., 2., 3.
-    actual_weighting = _calculate_thompson_sampling(
-        study_guide_alpha, study_guide_beta, topic_alpha, topic_beta)
+    actual_weighting = _calculate_thompson_sampling(2, 2, 1, 3)
     assert actual_weighting == pytest.approx(0.886, abs=0.001)
