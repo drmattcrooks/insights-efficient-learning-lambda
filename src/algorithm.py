@@ -152,7 +152,7 @@ def calculate_study_guide_weighting(
 
 
 @docstrings.calculate_beta_distribution_mean
-# @validation.calculate_beta_distribution_mean
+@validation.calculate_beta_distribution_mean
 def calculate_beta_distribution_mean(alpha, beta_):
     return alpha / (alpha + beta_)
 
