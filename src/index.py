@@ -1,9 +1,14 @@
 import algorithm
 import helper
 import os
+import docstrings
+import validation
 
 # pylint: disable=too-many-locals
 # pylint: disable=unused-argument
+
+
+USE_INFORMED_PRIORS = bool(os.getenv('USE_INFORMED_PRIORS')) or False
 
 
 def handler(event, context):
@@ -31,12 +36,12 @@ def handler(event, context):
 
     question_id_list = _create_question_id_list(questions)
 
-    study_guide_score_and_attempts, topic_score_and_attempts = \
+    study_guide_alpha_and_beta, topic_alpha_and_beta = \
         _accumulate_score_and_attempts(
             study_guide_id_list, topic_id_list, questions)
 
-    _add_weighted_score_and_attempts(
-        study_guide_score_and_attempts, topic_score_and_attempts,
+    _add_weighted_alpha_and_beta(
+        study_guide_alpha_and_beta, topic_alpha_and_beta,
         study_guide_id_list, topic_id_for_study_guide_id)
 
     if return_results:
@@ -44,16 +49,16 @@ def handler(event, context):
         for study_guide_id in study_guide_id_list:
             topic_id = topic_id_for_study_guide_id[study_guide_id]
 
-            weighted_score = study_guide_score_and_attempts[
-                study_guide_id]['weighted_score']
-            weighted_attempts = study_guide_score_and_attempts[
-                study_guide_id]['weighted_attempts']
+            weighted_alpha = study_guide_alpha_and_beta[
+                study_guide_id]['weighted_alpha']
+            weighted_beta = study_guide_alpha_and_beta[
+                study_guide_id]['weighted_beta']
 
             mastery = float(algorithm.calculate_beta_distribution_mean(
-                weighted_score, weighted_attempts))
+                weighted_alpha, weighted_beta))
 
             mastery_band, band_confidence = algorithm.calculate_mastery_band_and_confidence(
-                mastery, weighted_score, weighted_attempts)
+                mastery, weighted_alpha, weighted_beta)
 
             results_list.append({
                 'studyGuideId': study_guide_id,
@@ -66,7 +71,7 @@ def handler(event, context):
         response['results'] = results_list
     else:
         confidence_intervals_list = algorithm.calculate_confidence_intervals_list(
-            study_guide_id_list, study_guide_score_and_attempts)
+            study_guide_id_list, study_guide_alpha_and_beta)
 
         response['nextQuestion'] = algorithm.choose_next_question(
             topic_id_for_study_guide_id, study_guide_id_list,
@@ -75,43 +80,46 @@ def handler(event, context):
     return _build_response(200, response)
 
 
-def _add_weighted_score_and_attempts(
-    study_guide_score_and_attempts, topic_score_and_attempts,
+def _add_weighted_alpha_and_beta(
+    study_guide_alpha_and_beta, topic_alpha_and_beta,
         study_guide_id_list, topic_id_for_study_guide_id):
 
     for study_guide_id in study_guide_id_list:
         topic_id = topic_id_for_study_guide_id[study_guide_id]
-        topic_score = topic_score_and_attempts[topic_id]['score']
-        topic_attempts = topic_score_and_attempts[topic_id]['attempts']
+        topic_alpha = topic_alpha_and_beta[topic_id]['alpha']
+        topic_beta = topic_alpha_and_beta[topic_id]['beta']
 
-        study_guide_score = study_guide_score_and_attempts[study_guide_id]['score']
-        study_guide_attempts = study_guide_score_and_attempts[study_guide_id]['attempts']
+        study_guide_alpha = study_guide_alpha_and_beta[study_guide_id]['alpha']
+        study_guide_beta = study_guide_alpha_and_beta[study_guide_id]['beta']
 
         study_guide_weighting = algorithm.calculate_study_guide_weighting(
-            study_guide_score, study_guide_attempts, topic_score, topic_attempts)
+            study_guide_alpha, study_guide_beta, topic_alpha, topic_beta)
 
-        study_guide_score_and_attempts[study_guide_id]['weighted_score'] = \
+        study_guide_alpha_and_beta[study_guide_id]['weighted_alpha'] = \
             algorithm.calculate_weighted_value(
-                study_guide_weighting, study_guide_score, topic_score)
+                study_guide_weighting, study_guide_alpha, topic_alpha)
 
-        study_guide_score_and_attempts[study_guide_id]['weighted_attempts'] = \
+        study_guide_alpha_and_beta[study_guide_id]['weighted_beta'] = \
             algorithm.calculate_weighted_value(
-                study_guide_weighting, study_guide_attempts, topic_attempts)
+                study_guide_weighting, study_guide_beta, topic_beta)
 
 
+@docstrings._accumulate_score_and_attempts
+@validation._accumulate_score_and_attempts
 def _accumulate_score_and_attempts(
         study_guide_id_list, topic_id_list, questions):
 
-    topic_score_and_attempts = _initialise_score_and_attempts(topic_id_list)
-    study_guide_score_and_attempts = _initialise_score_and_attempts(
+    topic_alpha_and_beta = _initialise_alpha_and_beta(
+        topic_id_list)
+    study_guide_alpha_and_beta = _initialise_alpha_and_beta(
         study_guide_id_list)
 
     for question in questions:
-        _update_topic_score_and_attempts(topic_score_and_attempts, question)
-        _update_study_guide_score_and_attempts(
-            study_guide_score_and_attempts, question)
+        _update_topic_alpha_and_beta(topic_alpha_and_beta, question)
+        _update_study_guide_alpha_and_beta(
+            study_guide_alpha_and_beta, question)
 
-    return study_guide_score_and_attempts, topic_score_and_attempts
+    return study_guide_alpha_and_beta, topic_alpha_and_beta
 
 
 def _create_question_id_list(questions):
@@ -119,29 +127,58 @@ def _create_question_id_list(questions):
     return question_id_list
 
 
-def _initialise_score_and_attempts(list_):
-    return {
+def _initialise_alpha_and_beta_results(study_guide_id_list, questions=[]):
+    total_score = sum([question['isCorrect'] for question in questions])
+    alpha_prior, beta_prior = 1., 1.
+
+    if USE_INFORMED_PRIORS:
+        informed_priors_params = helper.load_informed_priors()
+        alpha_prior, beta_prior = informed_priors_params[total_score]
+
+    alpha_and_beta = {
         key: {
-            'score': 0.,
-            'attempts': 0.
-        } for key in list_
+            'alpha': alpha_prior,
+            'beta': beta_prior
+        } for key in study_guide_id_list
     }
+    return alpha_and_beta
 
 
-def _update_topic_score_and_attempts(topic_score_and_attempts, question):
+def _initialise_alpha_and_beta(study_guide_id_list):
+    alpha_prior, beta_prior = 1., 1.
+    alpha_and_beta = {
+        key: {
+            'alpha': alpha_prior,
+            'beta': beta_prior
+        } for key in study_guide_id_list
+    }
+    return alpha_and_beta
+
+
+def _update_topic_alpha_and_beta(topic_alpha_and_beta, question):
     topic_id = question['topicId']
     score = question['isCorrect']
 
-    topic_score_and_attempts[topic_id]['score'] += score
-    topic_score_and_attempts[topic_id]['attempts'] += 1
+    topic_alpha_and_beta[topic_id]['alpha'] += score
+    topic_alpha_and_beta[topic_id]['beta'] += 1 - score
 
 
-def _update_study_guide_score_and_attempts(study_guide_score_and_attempts, question):
+def _update_study_guide_score_and_attempts(
+        study_guide_alpha_and_beta, question):
+
     study_guide_id = question['studyGuideId']
     score = question['isCorrect']
 
-    study_guide_score_and_attempts[study_guide_id]['score'] += score
-    study_guide_score_and_attempts[study_guide_id]['attempts'] += 1
+    study_guide_alpha_and_beta[study_guide_id]['score'] += score
+    study_guide_alpha_and_beta[study_guide_id]['attempts'] += 1.
+
+
+def _update_study_guide_alpha_and_beta(study_guide_alpha_and_beta, question):
+    study_guide_id = question['studyGuideId']
+    score = question['isCorrect']
+
+    study_guide_alpha_and_beta[study_guide_id]['alpha'] += score
+    study_guide_alpha_and_beta[study_guide_id]['beta'] += 1 - score
 
 
 def _build_response(code, body):
