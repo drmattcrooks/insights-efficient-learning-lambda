@@ -3,48 +3,6 @@ def _add_docstring(function, docstring):
     return function
 
 
-def _accumulate_score_and_attempts(function):
-    docstring = """
-Adds up the number of attempted questions and the score per study guide and per topic. These are 
-converted to alpha and beta parameters of the Beta distribution associated with each
-
-Parameters
-----------
-study_guide_id_list : list of strings
-    list containing all the study guide ids in the test
-topic_id_list : list of strings
-    list containing all topic ids in the test
-questions : list of dicts
-    question attribute from the event object. Contains all the metadata from the user's responses
-    
-Returns
--------
-study_guide_alpha_and_beta : Nested dict of all alpha and beta parameters for each study guide. Outer dict has study guide
-    ids as keys that point to a dict object as the values. Inner dict has 'alpha' and 'beta' as keys
-    should be a result for every study guide id in study_guide_ids_list
-    alpha and beta should be non-negative floats
-topic_alpha_and_beta : Nested dict of all alpha and beta parameters for each topic. Outer dict has topic
-    ids as keys that point to a dict object as the values. Inner dict has 'alpha' and 'beta' as keys
-    should be a result for every topic id in topic_list
-    alpha and beta should be non-negative floats
-    
-Raises
-------
-TypeError : study_guide_id_list should be a list, a {study_guide_id_list.__class__.__name__} was provided
-    when study_guide_id_list is anything except a list
-TypeError : topic_id_list should be a list, a {topic_id_list.__class__.__name__} was provided
-    when topic_id_list is anything except a list
-TypeError : questions should be a list, a {questions.__class__.__name__} was provided
-    when questions is anything except a list
-    
-ValueError : unexpected value encountered in study_guide_id_list: study_guide_ids should be a non-empty string
-    when study_guide_id_list contains something other than non-empty string
-ValueError : unexpected value encountered in topic_id_list: topic_ids should be a non-empty string
-    when topic_id_list contains something other than non-empty string
-"""
-    return _add_docstring(function, docstring)
-
-
 def calculate_weighted_value(function):
     docstring = """
 Takes a weighted average of a value associated with a study guide and the corresponding value for the topic and returns a weighted average. 
@@ -175,15 +133,18 @@ Calculates expected value or mean of a beta distribution.
 
 Raises
 ------
-TypeError : alpha should be a float, a {alpha.__class__.__name__} was provided
-    when alpha is anything except a float
-TypeError : beta should be a float, a {beta.__class__.__name__} was provided
-    when beta is anything except a float
+TypeError : score should be a float, a {score.__class__.__name__} was provided
+    when score is anything except a float
+TypeError : attempts should be a float, a {score.__class__.__name__} was provided
+    when attempts is anything except a float
 
-ValueError : {alpha} < 0 : alpha should be non-negative
-    when alpha is negative
-ValueError : {beta} < 0 : beta should be non-negative
-    when beta is negative
+ValueError : {score} < 0 : score should be non-negative
+    when score is negative
+ValueError : {attempts} < 0 : attempts should be non-negative
+    when attempts is negative
+
+ValueError : {score} > {attempts} : score should be less than or equal to attempts
+    when score is > attempts
 """
     return _add_docstring(function, docstring)
 

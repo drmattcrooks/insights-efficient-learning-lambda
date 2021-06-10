@@ -1,7 +1,3 @@
-import pytest
-from index import handler
-
-
 from test.fixtures.events import INVALID_EVENT, \
     VALID_EVENT_NO_QUESTIONS, \
     VALID_EVENT_NO_RESULTS, VALID_EVENT_WITH_RESULTS,\
@@ -9,6 +5,10 @@ from test.fixtures.events import INVALID_EVENT, \
 from test.fixtures.questions import NEXT_QUESTION, \
     VALID_QUESTION_RESPONSE_NO_RESULTS, VALID_RESPONSE_WITH_RESULTS,\
     REPEATABLE_RESULTS
+
+
+import pytest
+from index import handler
 
 CONTEXT = None
 

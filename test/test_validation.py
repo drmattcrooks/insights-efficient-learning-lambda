@@ -1,76 +1,5 @@
 import pytest
 import algorithm
-import index
-
-
-# --------------------------------------------------------
-# Validation tests on index._accumulate_score_and_attempts
-# --------------------------------------------------------
-
-@pytest.mark.validation_accumulate_score_and_attempts
-def test_accumulate_score_and_attempts_study_guide_id_list_is_list():
-    questions = []
-    study_guide_id_list = set([f"zg{i}" for i in range(1, 7)])
-    topic_id_list = ['zt1', 'zt2']
-    try:
-        index._accumulate_score_and_attempts(
-            study_guide_id_list, topic_id_list, questions)
-        assert False
-    except Exception as error:
-        assert error.__class__.__name__ == 'TypeError'
-        assert str(error) == f"study_guide_id_list should be a list, a {study_guide_id_list.__class__.__name__} was provided"
-
-
-@pytest.mark.validation_accumulate_score_and_attempts
-def test_accumulate_score_and_attempts_topic_id_list_is_list():
-    questions = []
-    study_guide_id_list = [f"zg{i}" for i in range(1, 7)]
-    topic_id_list = set(['zt1', 'zt2'])
-    try:
-        index._accumulate_score_and_attempts(
-            study_guide_id_list, topic_id_list, questions)
-        assert False
-    except Exception as error:
-        assert error.__class__.__name__ == 'TypeError'
-        assert str(error) == f"topic_id_list should be a list, a {topic_id_list.__class__.__name__} was provided"
-
-
-@pytest.mark.validation_accumulate_score_and_attempts
-def test_accumulate_score_and_attempts_questions_is_list():
-    questions = {}
-    study_guide_id_list = [f"zg{i}" for i in range(1, 7)]
-    topic_id_list = ['zt1', 'zt2']
-    try:
-        index._accumulate_score_and_attempts(
-            study_guide_id_list, topic_id_list, questions)
-        assert False
-    except Exception as error:
-        assert error.__class__.__name__ == 'TypeError'
-        assert str(error) == f"questions should be a list, a {questions.__class__.__name__} was provided"
-
-
-# @pytest.mark.validation_accumulate_score_and_attempts
-# def test_accumulate_score_and_attempts_study_guide_ids_nonempty_str():
-#     questions = []
-#     study_guide_id_list = [None] + [f"zg{i}" for i in range(2, 7)]
-#     topic_id_list = ['zt1', 'zt2']
-#     try:
-#         index._accumulate_score_and_attempts(
-#             study_guide_id_list, topic_id_list, questions)
-#         assert False
-#     except Exception as error:
-#         assert error.__class__.__name__ == 'ValueError'
-#         assert str(error) == f"unexpected value encountered in study_guide_id_list: study_guide_ids should be a non-empty string"
-#
-#     study_guide_id_list = [''] + [f"zg{i}" for i in range(2, 7)]
-#     try:
-#         index._accumulate_score_and_attempts(
-#             study_guide_id_list, topic_id_list, questions)
-#         assert False
-#     except Exception as error:
-#         assert error.__class__.__name__ == 'ValueError'
-#         assert str(
-#             error) == f"unexpected value encountered in study_guide_id_list: study_guide_ids should be a non-empty string"
 
 
 # -------------------------------------------------------------------
@@ -161,18 +90,18 @@ def test_calculate_weighted_value_topic_value_nonnegative():
         assert str(error) == f"{topic_value} < 0 : topic_value should be non-negative"
 
 
-# @pytest.mark.validation_calculate_weighted_value
-# def test_calculate_weighted_value_study_guide_value_lt_topic_value():
-#     weighting = 0.5
-#     study_guide_value = 2.
-#     topic_value = 1.
-#     try:
-#         algorithm.calculate_weighted_value(
-#             weighting, study_guide_value, topic_value)
-#         assert False
-#     except Exception as error:
-#         assert error.__class__.__name__ == 'ValueError'
-#         assert str(error) == f"{study_guide_value} > {topic_value} : study_guide_value should be less than or equal to topic_value"
+@pytest.mark.validation_calculate_weighted_value
+def test_calculate_weighted_value_study_guide_value_lt_topic_value():
+    weighting = 0.5
+    study_guide_value = 2.
+    topic_value = 1.
+    try:
+        algorithm.calculate_weighted_value(
+            weighting, study_guide_value, topic_value)
+        assert False
+    except Exception as error:
+        assert error.__class__.__name__ == 'ValueError'
+        assert str(error) == f"{study_guide_value} > {topic_value} : study_guide_value should be less than or equal to topic_value"
 
 
 # -------------------------------------------------------------------
@@ -427,6 +356,19 @@ def test_calculate_confidence_interval_weighted_attempts_is_nonnegative():
         assert str(error) == f"{weighted_attempts} < 0 : weighted_attempts should be non-negative"
 
 
+@pytest.mark.validation_calculate_confidence_interval
+def test_calculate_confidence_interval_weighted_score_lt_attempts():
+    weighted_score = 5.
+    weighted_attempts = 3.
+    try:
+        algorithm.calculate_confidence_interval(
+            weighted_score, weighted_attempts)
+        assert False
+    except Exception as error:
+        assert error.__class__.__name__ == 'ValueError'
+        assert str(error) == f"{weighted_score} > {weighted_attempts} : weighted_score should be less than or equal to weighted_attempts"
+
+
 # ---------------------------------------------------------------------------
 # Validation tests on algorithm._convert_confidence_interval_into_probability
 # ---------------------------------------------------------------------------
@@ -501,52 +443,60 @@ def test_place_mastery_in_band_mastery_in_0_to_1():
 def test_calculate_beta_distribution_mean_score_is_float():
     score = 1
     attempts = 2.
-    alpha = int(1. + score)
-    beta_ = 1. + attempts - score
     try:
-        algorithm.calculate_beta_distribution_mean(alpha, beta_)
+        algorithm.calculate_beta_distribution_mean(score, attempts)
         assert False
     except Exception as error:
         assert error.__class__.__name__ == 'TypeError'
-        assert str(error) == f"alpha should be a float, a {alpha.__class__.__name__} was provided"
+        assert str(error) == f"score should be a float, a {score.__class__.__name__} was provided"
 
 
 @pytest.mark.validation_calculate_beta_distribution_mean
 def test_calculate_beta_distribution_mean_attempts_is_float():
     score = 1.
     attempts = 2
-    alpha = 1. + score
-    beta_ = int(1. + attempts - score)
     try:
-        algorithm.calculate_beta_distribution_mean(alpha, beta_)
+        algorithm.calculate_beta_distribution_mean(score, attempts)
         assert False
     except Exception as error:
         assert error.__class__.__name__ == 'TypeError'
-        assert str(error) == f"beta should be a float, a {beta_.__class__.__name__} was provided"
+        assert str(error) == f"attempts should be a float, a {score.__class__.__name__} was provided"
 
 
 @pytest.mark.validation_calculate_beta_distribution_mean
 def test_calculate_beta_distribution_mean_score_is_nonegative():
-    alpha = -1.
-    beta_ = 2.
+    score = -1.
+    attempts = 2.
     try:
-        algorithm.calculate_beta_distribution_mean(alpha, beta_)
+        algorithm.calculate_beta_distribution_mean(score, attempts)
         assert False
     except Exception as error:
         assert error.__class__.__name__ == 'ValueError'
-        assert str(error) == f"{alpha} < 0 : score should be non-negative"
+        assert str(error) == f"{score} < 0 : score should be non-negative"
 
 
 @pytest.mark.validation_calculate_beta_distribution_mean
 def test_calculate_beta_distribution_mean_attempts_is_nonegative():
-    alpha = 1.
-    beta_ = -2.
+    score = 1.
+    attempts = -2.
     try:
-        algorithm.calculate_beta_distribution_mean(alpha, beta_)
+        algorithm.calculate_beta_distribution_mean(score, attempts)
         assert False
     except Exception as error:
         assert error.__class__.__name__ == 'ValueError'
-        assert str(error) == f"{beta_} < 0 : attempts should be non-negative"
+        assert str(error) == f"{attempts} < 0 : attempts should be non-negative"
+
+
+@pytest.mark.validation_calculate_beta_distribution_mean
+def test_calculate_beta_distribution_mean_score_lt_attempts():
+    score = 2.
+    attempts = 1.
+    try:
+        algorithm.calculate_beta_distribution_mean(score, attempts)
+        assert False
+    except Exception as error:
+        assert error.__class__.__name__ == 'ValueError'
+        assert str(error) == f"{score} > {attempts} : score should be less than or equal to attempts"
 
 
 # --------------------------------------------------------
@@ -555,9 +505,9 @@ def test_calculate_beta_distribution_mean_attempts_is_nonegative():
 
 @pytest.mark.validation_calculate_band_confidence
 def test_calculate_band_confidence_mastery_is_float():
-    mastery_score, alpha, beta = '0.7', 1., 1.
+    mastery_score, score, attempts = '0.7', 1., 1.
     try:
-        algorithm._calculate_band_confidence(mastery_score, alpha, beta)
+        algorithm._calculate_band_confidence(mastery_score, score, attempts)
         assert False
     except Exception as error:
         assert error.__class__.__name__ == 'TypeError'
@@ -565,40 +515,40 @@ def test_calculate_band_confidence_mastery_is_float():
 
 
 @pytest.mark.validation_calculate_band_confidence
-def test_calculate_band_confidence_alpha_is_float():
-    mastery_score, alpha, beta = 0.7, 1, 1.
+def test_calculate_band_confidence_score_is_float():
+    mastery_score, score, attempts = 0.7, 1, 1.
     try:
-        algorithm._calculate_band_confidence(mastery_score, alpha, beta)
+        algorithm._calculate_band_confidence(mastery_score, score, attempts)
         assert False
     except Exception as error:
         assert error.__class__.__name__ == 'TypeError'
-        assert str(error) == f"alpha should be a float, a {alpha.__class__.__name__} was provided"
+        assert str(error) == f"score should be a float, a {score.__class__.__name__} was provided"
 
 
 @pytest.mark.validation_calculate_band_confidence
 def test_calculate_band_confidence_attempts_is_float():
-    mastery_score, alpha, beta = 0.7, 1., 1
+    mastery_score, score, attempts = 0.7, 1., 1
     try:
-        algorithm._calculate_band_confidence(mastery_score, alpha, beta)
+        algorithm._calculate_band_confidence(mastery_score, score, attempts)
         assert False
     except Exception as error:
         assert error.__class__.__name__ == 'TypeError'
-        assert str(error) == f"beta should be a float, a {beta.__class__.__name__} was provided"
+        assert str(error) == f"attempts should be a float, a {attempts.__class__.__name__} was provided"
 
 
 @pytest.mark.validation_calculate_band_confidence
 def test_calculate_band_confidence_mastery_score_in_0_to_1():
-    mastery_score, alpha, beta = -0.7, 1., 1.
+    mastery_score, score, attempts = -0.7, 1., 1.
     try:
-        algorithm._calculate_band_confidence(mastery_score, alpha, beta)
+        algorithm._calculate_band_confidence(mastery_score, score, attempts)
         assert False
     except Exception as error:
         assert error.__class__.__name__ == 'ValueError'
         assert str(error) == f"unexpected value encountered : mastery_score should be in the interval [0, 1]"
 
-    mastery_score, alpha, beta = 7., 1., 1.
+    mastery_score, score, attempts = 7., 1., 1.
     try:
-        algorithm._calculate_band_confidence(mastery_score, alpha, beta)
+        algorithm._calculate_band_confidence(mastery_score, score, attempts)
         assert False
     except Exception as error:
         assert error.__class__.__name__ == 'ValueError'
@@ -607,24 +557,35 @@ def test_calculate_band_confidence_mastery_score_in_0_to_1():
 
 @pytest.mark.validation_calculate_band_confidence
 def test_calculate_band_confidence_score_is_non_negative():
-    mastery_score, alpha, beta = 0.7, -1., 1.
+    mastery_score, score, attempts = 0.7, -1., 1.
     try:
-        algorithm._calculate_band_confidence(mastery_score, alpha, beta)
+        algorithm._calculate_band_confidence(mastery_score, score, attempts)
         assert False
     except Exception as error:
         assert error.__class__.__name__ == 'ValueError'
-        assert str(error) == f"{alpha} < 0 : alpha should be non-negative"
+        assert str(error) == f"{score} < 0 : score should be non-negative"
 
 
 @pytest.mark.validation_calculate_band_confidence
 def test_calculate_band_confidence_attempts_is_non_negative():
-    mastery_score, alpha, beta = 0.7, 1., -1.
+    mastery_score, score, attempts = 0.7, 1., -1.
     try:
-        algorithm._calculate_band_confidence(mastery_score, alpha, beta)
+        algorithm._calculate_band_confidence(mastery_score, score, attempts)
         assert False
     except Exception as error:
         assert error.__class__.__name__ == 'ValueError'
-        assert str(error) == f"{beta} < 0 : beta should be non-negative"
+        assert str(error) == f"{attempts} < 0 : attempts should be non-negative"
+
+
+@pytest.mark.validation_calculate_band_confidence
+def test_calculate_band_confidence_score_lt_attempts():
+    mastery_score, score, attempts = 0.7, 2., 1.
+    try:
+        algorithm._calculate_band_confidence(mastery_score, score, attempts)
+        assert False
+    except Exception as error:
+        assert error.__class__.__name__ == 'ValueError'
+        assert str(error) == f"{score} > {attempts} : score should be less than or equal to attempts"
 
 
 # ---------------------------------------------------------------
@@ -773,6 +734,54 @@ def test_calculate_study_guide_weighting_topic_attempts_is_nonnegative():
     except Exception as error:
         assert error.__class__.__name__ == 'ValueError'
         assert str(error) == f"{topic_attempts} < 0 : topic_attempts should be non-negative"
+
+
+@pytest.mark.validation_calculate_study_guide_weighting
+def test_calculate_study_guide_weighting_study_guide_score_lt_attempts():
+    study_guide_score, study_guide_attempts, topic_score, topic_attempts = 10., 1., 2., 2.
+    try:
+        algorithm.calculate_study_guide_weighting(
+            study_guide_score, study_guide_attempts, topic_score, topic_attempts)
+        assert False
+    except Exception as error:
+        assert error.__class__.__name__ == 'ValueError'
+        assert str(error) == f"{study_guide_score} > {study_guide_attempts} : study_guide_score should be less than or equal to study_guide_attempts"
+
+
+@pytest.mark.validation_calculate_study_guide_weighting
+def test_calculate_study_guide_weighting_topic_score_lt_attempts():
+    study_guide_score, study_guide_attempts, topic_score, topic_attempts = 1., 1., 20., 2.
+    try:
+        algorithm.calculate_study_guide_weighting(
+            study_guide_score, study_guide_attempts, topic_score, topic_attempts)
+        assert False
+    except Exception as error:
+        assert error.__class__.__name__ == 'ValueError'
+        assert str(error) == f"{topic_score} > {topic_attempts} : topic_score should be less than or equal to topic_attempts"
+
+
+@pytest.mark.validation_calculate_study_guide_weighting
+def test_calculate_study_guide_weighting_study_guide_score_lt_topic_score():
+    study_guide_score, study_guide_attempts, topic_score, topic_attempts = 3., 3., 2., 4.
+    try:
+        algorithm.calculate_study_guide_weighting(
+            study_guide_score, study_guide_attempts, topic_score, topic_attempts)
+        assert False
+    except Exception as error:
+        assert error.__class__.__name__ == 'ValueError'
+        assert str(error) == f"{study_guide_score} > {topic_score} : study_guide_score should be less than or equal to topic_score"
+
+
+@pytest.mark.validation_calculate_study_guide_weighting
+def test_calculate_study_guide_weighting_study_guide_attempts_lt_topic_attempts():
+    study_guide_score, study_guide_attempts, topic_score, topic_attempts = 2., 5., 2., 4.
+    try:
+        algorithm.calculate_study_guide_weighting(
+            study_guide_score, study_guide_attempts, topic_score, topic_attempts)
+        assert False
+    except Exception as error:
+        assert error.__class__.__name__ == 'ValueError'
+        assert str(error) == f"{study_guide_attempts} > {topic_attempts} : study_guide_attempts should be less than or equal to topic_attempts"
 
 
 # -------------------------------------------------------------------
